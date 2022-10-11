@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CSharpTree
 {
@@ -12,15 +14,18 @@ namespace CSharpTree
         public TreeNode<T> Parent { get; set; }
         public ICollection<TreeNode<T>> Children { get; set; }
 
-        public Boolean IsRoot
-        {
-            get { return Parent == null; }
-        }
+        public event Nullable<Action<T>> CollectionChanged;
 
-        public Boolean IsLeaf
-        {
-            get { return Children.Count == 0; }
-        }
+        /// <summary>
+        /// Whether the node has no parent
+        /// </summary>
+        public bool IsRoot => Parent == null;
+
+
+        /// <summary>
+        /// Whether the node has no children
+        /// </summary>
+        public bool IsLeaf => Children.Count == 0;
 
         public int Level
         {
@@ -49,17 +54,19 @@ namespace CSharpTree
 
             this.RegisterChildForSearch(childNode);
 
+            CollectionChanged?.Invoke(child);
+
             return childNode;
         }
 
         public override string ToString()
         {
-            return Data != null ? Data.ToString() : "[data null]";
+            return Data != null ? Data.ToString() : "null";
         }
 
 
         #region searching
-        
+
         private ICollection<TreeNode<T>> ElementsIndex { get; set; }
 
         private void RegisterChildForSearch(TreeNode<T> node)
@@ -74,11 +81,35 @@ namespace CSharpTree
             return this.ElementsIndex.FirstOrDefault(predicate);
         }
 
+        public List<TreeNode<T>> GetParents()
+        {
+            var parents = new List<TreeNode<T>>();
+
+            TreeNode<T> currentNode = this.Parent;
+
+            while (true)
+            {
+
+                if (currentNode != null && currentNode.Data != null)
+                {
+                    parents.Add(currentNode);
+                    currentNode = currentNode.Parent;
+                }
+                else
+                {
+                    // no more parents, reached top
+                    break;
+                }
+            }
+
+            return parents;
+        }
+
         #endregion
 
 
         #region iterating
-        
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
