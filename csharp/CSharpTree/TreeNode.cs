@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SKGUIToolkit.Types
+namespace CSharpTree
 {
     public class TreeNode<T> : IEnumerable<TreeNode<T>>
     {
